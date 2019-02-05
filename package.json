@@ -14,6 +14,7 @@
     "@makerdao/ui-components": "1.0.0-alpha.29",
     "bignumber.js": "^8.0.1",
     "ethers": "^4.0.18",
+    "fs": "^0.0.1-security",
     "jazzicon": "^1.5.0",
     "lodash.round": "^4.0.4",
     "prop-types": "^15.6.2",
@@ -33,6 +34,7 @@
   },
   "scripts": {
     "start": "HTTPS=true NODE_ENV=development craco start",
+    "start:http": "HTTPS=false NODE_ENV=development craco start",
     "build": "craco build",
     "deploy": "yarn build && now ./build -A ../now.json",
     "test": "jest",

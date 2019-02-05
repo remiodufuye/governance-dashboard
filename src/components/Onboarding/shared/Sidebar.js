@@ -225,12 +225,18 @@ const Sidebar = ({
                   <tr key={name + addresses[network]}>
                     <td>{name}</td>
                     <td>
-                      <ExternalLink
-                        target="_blank"
-                        href={ethScanLink(addresses[network], network)}
-                      >
-                        <Address full={addresses[network]} shorten />
-                      </ExternalLink>
+                      {network === 'ganache' ? (
+                        <ExternalLink target="_blank" href="">
+                          <Address full={addresses[network]} shorten />
+                        </ExternalLink>
+                      ) : (
+                        <ExternalLink
+                          target="_blank"
+                          href={ethScanLink(addresses[network], network)}
+                        >
+                          <Address full={addresses[network]} shorten />
+                        </ExternalLink>
+                      )}
                     </td>
                   </tr>
                 ))}

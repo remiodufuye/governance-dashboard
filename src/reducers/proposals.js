@@ -87,24 +87,88 @@ const fetchNetwork = async (url, network) => {
 // dispatch
 
 const fetchTopics = async network => {
-  if (process.env.REACT_APP_GOV_BACKEND === 'mock' || network === 'ganache') {
+  console.log('fetch topics network', network);
+  // If we're running a testchain, we want the kovan topics, and we'll overwrite the addresses later
+  if (network === 'ganache') {
+    return await fetchNetwork(staging, 'kovan');
+  }
+  if (process.env.REACT_APP_GOV_BACKEND === 'mock') {
+    console.log('fetch topics mock', network);
     return await fetchMock(network);
   }
 
   if (process.env.REACT_APP_GOV_BACKEND === 'local') {
+    console.log('fetch topics network local', network);
     return await fetchNetwork(local, network);
   }
 
   if (process.env.REACT_APP_GOV_BACKEND === 'staging') {
+    console.log('fetch topics network staging', network);
     return await fetchNetwork(staging, network);
   }
 
+  console.log('fetch topics network prod', network);
   return await fetchNetwork(prod, network);
 };
 
 // Actions ------------------------------------------------
+const adds = {
+  mkr: '0xf6934788cf4c399367e3c9290c27668c90fa42f5',
+  iou: '0x1e1bb4ca0c6cbc6ce0c65de0462ccf401182663a',
+  chief: '0x28adf417206d1a2a17340d5775c6c6e4127af4b8',
+  polling: '0x7e20ada7a16fe0aec104f66aefc109f6abf7247b',
+  proxy_factory: '0xcb8e3d967b4b1da397220a31dcab17f1e4414d52',
+  'kovan-example-executive-proposal-1':
+    '0xBf1182cAE267143C281534364C1f2637420BAf59'
+};
+
+//TODO make private func for converting topic key to pascal case
+
+const updateSourceForTestnet = topics => {
+  console.log('topics', topics);
+  const cInfo = window.maker.service('smartContract')._getAllContractInfo();
+  console.log('cInfo', cInfo);
+  //cheat:
+  const KOVAN_EXAMPLE_EXECUTIVE_PROPOSAL_1 =
+    'KOVAN_EXAMPLE_EXECUTIVE_PROPOSAL_1';
+
+  topics.map(topic => {
+    topic.proposals.map(proposal => {
+      console.log(proposal.key);
+      if (proposal.key in cInfo) {
+        console.log('cinfoPropKey', cInfo[proposal.key]);
+      }
+      //more cheat
+      if (proposal.key === 'kovan-example-executive-proposal-1') {
+        proposal.key = KOVAN_EXAMPLE_EXECUTIVE_PROPOSAL_1;
+        const exProp = window.maker
+          .service('smartContract')
+          .getContractAddressByName(KOVAN_EXAMPLE_EXECUTIVE_PROPOSAL_1); // the source I want
+
+        // this function works, but now do it right
+        console.log(proposal.source);
+
+        proposal.source = exProp;
+      }
+    });
+  });
+
+  return topics;
+  // TODO: actually use logic here...
+  // const contract = window.maker
+  //   .service('smartContract')
+  //   .getContractByName(KOVAN_EXAMPLE_EXECUTIVE_PROPOSAL_1);
+  // console.log('cont is', contract);
+};
 
 function extractProposals(topics, network) {
+  // if key in config map, overwrite the source (address) with config value
+  // make sure connects to staging backend & fetches kovan version
+  // update staging cms with upcoming yes/no propsals (disable)
+  console.log(topics);
+  const newTopics = updateSourceForTestnet(topics);
+  console.log('new topics', newTopics);
+
   return topics.reduce((acc, topic) => {
     const proposals = topic.proposals.map(({ source, ...otherProps }) => ({
       ...otherProps,

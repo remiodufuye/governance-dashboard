@@ -37,8 +37,12 @@ export default async function createMaker(
   };
 
   // Use the config plugin, if we have a testchainConfigId
-  if (testchainConfigId)
+  // TODO delete provider property
+  if (testchainConfigId) {
+    delete config.provider;
     config.plugins.push([configPlugin, { testchainId: testchainConfigId }]);
+    console.log('config to start maker', config);
+  }
   return Maker.create('http', config);
 }
 

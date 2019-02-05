@@ -83,6 +83,7 @@ export const initWeb3Accounts = () => async (dispatch, getState) => {
       await dispatch(setActiveAccount(address, true));
     }
   } else if (fetching && !activeAddress) {
+    console.log('no MM accounts dispatch from initweb3 function');
     dispatch({ type: NO_METAMASK_ACCOUNTS });
     dispatch(notAvailable());
   }
@@ -91,7 +92,19 @@ export const initWeb3Accounts = () => async (dispatch, getState) => {
 export const init = (network = 'mainnet') => async dispatch => {
   dispatch(connectRequest());
 
+  // If we are using a testnet, grab any accounts added already
+  //TODO: where should this live?
+  // if (network === 'ganache') {
+  //   const accounts = window.maker.service('accounts').listAccounts();
+  //   console.log(accounts, accounts.length);
+  //   accounts.map(account => {
+  //     console.log(ADD_ACCOUNT, account);
+  //     if (account.type === 'provider') account.type = 'browser';
+  //     if (account.type) dispatch({ type: ADD_ACCOUNT, payload: account });
+  //   });
+  // }
   if (!window.web3 || !window.web3.eth.defaultAccount) {
+    console.log('no MM accounts dispatch from init');
     dispatch({ type: NO_METAMASK_ACCOUNTS });
     dispatch(notAvailable());
   }
