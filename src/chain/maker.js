@@ -37,7 +37,6 @@ export default async function createMaker(
   };
 
   // Use the config plugin, if we have a testchainConfigId
-  // TODO delete provider property
   if (testchainConfigId) {
     delete config.provider;
     config.plugins.push([configPlugin, { testchainId: testchainConfigId }]);
